@@ -84,13 +84,16 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     }
     
     NSString *templateToUse = self.incomingCallContactHandleTemplate;
+    NSLog(@"[SevaroTwilioLog] Current self.incomingCallContactHandleTemplate: %@", templateToUse);
 
     if (templateToUse == nil || templateToUse.length == 0) {
         templateToUse = [[NSUserDefaults standardUserDefaults] stringForKey:@"IncomingCallContactHandleTemplate"];
+        NSLog(@"[SevaroTwilioLog] Loaded template from NSUserDefaults: %@", templateToUse);
     }
 
     if (templateToUse != nil && templateToUse.length > 0) {
         handleName = [self getDisplayName:templateToUse customParameters:[callInvite customParameters]];
+        NSLog(@"[SevaroTwilioLog] Updated handleName from template: %@", handleName);
     }
 
     CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:handleName];
