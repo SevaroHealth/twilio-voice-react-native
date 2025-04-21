@@ -26,12 +26,13 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
 }
 
 - (void)initializeCallKitWithConfiguration:(NSDictionary *)configuration {
+    NSLog(@"[SevaroTwilioLog] Initializing CallKit with configuration: %@", configuration);
     CXProviderConfiguration *callKitConfiguration = [CXProviderConfiguration new];
     
     if (configuration[kTwilioVoiceReactNativeCallKitMaximumCallGroups]) {
         callKitConfiguration.maximumCallGroups = [configuration[kTwilioVoiceReactNativeCallKitMaximumCallGroups] intValue];
     } else {
-        callKitConfiguration.maximumCallGroups = 1;
+        callKitConfiguration.maximumCallGroups = 3;
     }
 
     if (configuration[kTwilioVoiceReactNativeCallKitMaximumCallsPerCallGroup]) {
@@ -41,8 +42,12 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     }
 
     float version = [[UIDevice currentDevice].systemVersion floatValue];
-    if (version > 11.0 && configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents]) {
-        callKitConfiguration.includesCallsInRecents = [configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] boolValue];
+    if (version > 11.0) {
+        BOOL includesInRecents = YES;
+        if (configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] != nil) {
+            includesInRecents = [configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] boolValue];
+        }
+        callKitConfiguration.includesCallsInRecents = includesInRecents;
     }
 
     if (configuration[kTwilioVoiceReactNativeCallKitSupportedHandleTypes]) {
@@ -107,6 +112,7 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     callUpdate.supportsUngrouping = NO;
     callUpdate.hasVideo = NO;
 
+    NSLog(@"[SevaroTwilioLog] Reporting incoming call with uuid %@", callInvite.uuid.UUIDString);
     [self.callKitProvider reportNewIncomingCallWithUUID:callInvite.uuid update:callUpdate completion:^(NSError *error) {
         if (!error) {
             NSLog(@"Incoming call successfully reported.");
@@ -135,9 +141,36 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     CXEndCallAction *endCallAction = [[CXEndCallAction alloc] initWithCallUUID:uuid];
     CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
     
+    CXCallObserver *callObserver = [[CXCallObserver alloc] init];
+    NSArray<CXCall *> *currentCalls = callObserver.calls;
+
+    NSLog(@"[SevaroTwilioLog] Number of active calls in CallKit: %lu", (unsigned long)currentCalls.count);
+
+    for (CXCall *call in currentCalls) {
+        NSLog(@"[SevaroTwilioLog] Call UUID: %@, hasConnected: %d, hasEnded: %d, outgoing: %d",
+            call.UUID.UUIDString,
+            call.hasConnected,
+            call.hasEnded,
+            call.outgoing);
+    }
+
+    NSLog(@"[SevaroTwilioLog] End call action created with UUID: %@", uuid.UUIDString);
     [self.callKitCallController requestTransaction:transaction completion:^(NSError *error) {
         if (error) {
             NSLog(@"Failed to submit end-call transaction request: %@", error);
+            if (self.callMap[uuid.UUIDString]) {
+                NSLog(@"[SevaroTwilioLog] Found the call in twilio");
+                TVOCall *call = self.callMap[uuid.UUIDString];
+                NSLog(@"[SevaroTwilioLog] Disconnecting the twilio call call");
+                [call disconnect];
+                NSLog(@"[SevaroTwilioLog] Disconnected the twilio call call");
+            }
+            NSLog(@"[SevaroTwilioLog] Ending the call forcefully now");
+            [self.callKitProvider reportCallWithUUID:uuid
+                                         endedAtDate:[NSDate date]
+                                              reason:CXCallEndedReasonRemoteEnded];
+            NSLog(@"[SevaroTwilioLog] Call ended forcefully");
+
         } else {
             NSLog(@"End-call transaction successfully done");
         }

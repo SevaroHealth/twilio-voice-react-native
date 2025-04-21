@@ -94,7 +94,8 @@ static TVODefaultAudioDevice *sTwilioAudioDevice;
         TwilioVoiceSDK.audioDevice = sTwilioAudioDevice;
 
         TwilioVoiceSDK.logLevel = TVOLogLevelTrace;
-
+        
+        NSLog(@"[SevaroTwilioLog] Initializing TwilioVoiceReactNative");
         [self subscribeToNotifications];
         [self initializeCallKit];
         [self initializeAudioDeviceList];
