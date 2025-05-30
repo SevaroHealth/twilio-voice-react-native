@@ -43,6 +43,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
+import android.content.BroadcastReceiver;
+import android.os.Bundle;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -63,6 +65,8 @@ import java.util.UUID;
 
 public class VoiceService extends Service {
   private static final SDKLog logger = new SDKLog(VoiceService.class);
+  private static VoiceService instance;
+  private VoiceBroadcastReceiver broadcastReceiver;
   public class VoiceServiceAPI extends Binder {
     public Call connect(@NonNull ConnectOptions cxnOptions,
                         @NonNull Call.Listener listener) {
@@ -96,6 +100,29 @@ public class VoiceService extends Service {
     public Context getServiceContext() {
       return VoiceService.this;
     }
+  }
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    instance = this;
+    broadcastReceiver = new VoiceBroadcastReceiver(this);
+    broadcastReceiver.register();
+    logger.debug("VoiceService created");
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if (broadcastReceiver != null) {
+      broadcastReceiver.unregister();
+    }
+    instance = null;
+    logger.debug("VoiceService destroyed");
+  }
+
+  public static VoiceService getInstance() {
+    return instance;
   }
 
   @Override
@@ -181,7 +208,24 @@ public class VoiceService extends Service {
       logger.warning("WARNING: Incoming call cannot be handled, microphone permission not granted");
       return;
     }
-
+    boolean isRegistered = VoiceBroadcastReceiver.isPhoneAccountRegistered(VoiceService.this);
+    
+    if(isRegistered) {
+      logger.debug("Connection service is registered, sending broadcast intent and handling natively");
+      String callerName = VoiceBroadcastReceiver.getName(callRecord);
+      logger.debug("Caller Name: " + callerName);
+      Bundle callData = new Bundle();
+      callData.putString("callUUID", callRecord.getUuid().toString());
+      callData.putString("callSid", callRecord.getCallSid());
+      callData.putString("callerName", callerName);
+      callData.putString("from", callRecord.getCallInvite().getFrom());
+      VoiceBroadcastReceiver.broadCastIntent(
+        VoiceService.this,
+        VoiceBroadcastReceiver.TRIAGE_ACTION_START_INCOMING_CALL,
+        callData
+      );
+    } else {
+    logger.debug("Connection Service is not registered, sending broadcast intent to notification listener");
     // put up notification
     callRecord.setNotificationId(NotificationUtility.createNotificationIdentifier());
     Notification notification = NotificationUtility.createIncomingCallNotification(
@@ -195,6 +239,7 @@ public class VoiceService extends Service {
     // play ringer sound
     VoiceApplicationProxy.getAudioSwitchManager().getAudioSwitch().activate();
     VoiceApplicationProxy.getMediaPlayerManager().play(MediaPlayerManager.SoundTable.INCOMING);
+    }
 
     // trigger JS layer
     sendJSEvent(
@@ -224,12 +269,14 @@ public class VoiceService extends Service {
       return;
     }
 
+    if(!VoiceBroadcastReceiver.isPhoneAccountRegistered(VoiceService.this)){
     // cancel existing notification & put up in call
     Notification notification = NotificationUtility.createCallAnsweredNotificationWithLowImportance(
       VoiceService.this,
       callRecord);
     createOrReplaceForegroundNotification(callRecord.getNotificationId(), notification);
-
+    }
+    
     // stop ringer sound
     VoiceApplicationProxy.getMediaPlayerManager().stop();
 
@@ -292,12 +339,24 @@ public class VoiceService extends Service {
   private void cancelCall(final CallRecordDatabase.CallRecord callRecord) {
     logger.debug("CancelCall: " + callRecord.getUuid());
 
+    boolean isRegistered = VoiceBroadcastReceiver.isPhoneAccountRegistered(VoiceService.this);
+    if(isRegistered){
+      Bundle callData = new Bundle();
+      callData.putString("callUUID", callRecord.getUuid().toString());
+      callData.putInt("end_reason", 6);
+
+      VoiceBroadcastReceiver.broadCastIntent(
+          VoiceService.this,
+          VoiceBroadcastReceiver.TRIAGE_ACTION_REPORT_END_CALL, 
+          callData);
+    } else {
     // take down notification
     removeNotification(callRecord.getNotificationId());
 
     // stop ringer sound
     VoiceApplicationProxy.getMediaPlayerManager().stop();
     VoiceApplicationProxy.getAudioSwitchManager().getAudioSwitch().deactivate();
+    }
 
     // notify JS layer
     sendJSEvent(

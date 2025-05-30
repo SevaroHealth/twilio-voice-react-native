@@ -984,6 +984,9 @@ RCT_EXPORT_METHOD(voice_setIncomingCallContactHandleTemplate:(NSString *)templat
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     self.incomingCallContactHandleTemplate = template;
+    // Save to persistent storage so it's available on cold start
+    [[NSUserDefaults standardUserDefaults] setObject:template forKey:@"IncomingCallContactHandleTemplate"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     resolve(NULL);
 }
 
