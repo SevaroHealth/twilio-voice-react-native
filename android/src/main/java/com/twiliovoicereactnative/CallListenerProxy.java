@@ -33,6 +33,7 @@ import static com.twiliovoicereactnative.ReactNativeArgumentsSerializer.*;
 
 import com.twiliovoicereactnative.CallRecordDatabase.CallRecord;
 
+import android.os.Bundle;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -150,6 +151,14 @@ class CallListenerProxy implements Call.Listener {
     getAudioSwitchManager().getAudioSwitch().deactivate();
     getVoiceServiceApi().cancelActiveCallNotification(callRecord);
 
+    Bundle callData = new Bundle();
+    callData.putString("callUUID", uuid.toString());
+    callData.putInt("end_reason", 2);
+
+    VoiceBroadcastReceiver.broadCastIntent(
+        getVoiceServiceApi().getServiceContext(),
+        VoiceBroadcastReceiver.TRIAGE_ACTION_REPORT_END_CALL, 
+        callData);
     // notify JS layer
     sendJSEvent(
       constructJSMap(

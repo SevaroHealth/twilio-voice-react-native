@@ -31,7 +31,7 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     if (configuration[kTwilioVoiceReactNativeCallKitMaximumCallGroups]) {
         callKitConfiguration.maximumCallGroups = [configuration[kTwilioVoiceReactNativeCallKitMaximumCallGroups] intValue];
     } else {
-        callKitConfiguration.maximumCallGroups = 1;
+        callKitConfiguration.maximumCallGroups = 3;
     }
 
     if (configuration[kTwilioVoiceReactNativeCallKitMaximumCallsPerCallGroup]) {
@@ -41,8 +41,12 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     }
 
     float version = [[UIDevice currentDevice].systemVersion floatValue];
-    if (version > 11.0 && configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents]) {
-        callKitConfiguration.includesCallsInRecents = [configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] boolValue];
+    if (version > 11.0) {
+        BOOL includesInRecents = YES;
+        if (configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] != nil) {
+            includesInRecents = [configuration[kTwilioVoiceReactNativeCallKitIncludesCallsInRecents] boolValue];
+        }
+        callKitConfiguration.includesCallsInRecents = includesInRecents;
     }
 
     if (configuration[kTwilioVoiceReactNativeCallKitSupportedHandleTypes]) {
@@ -78,8 +82,17 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
 }
 
 - (void)reportNewIncomingCall:(TVOCallInvite *)callInvite {
-    NSString *handleName = callInvite.from;
-    if (handleName == nil) {
+   NSString *templateToUse = self.incomingCallContactHandleTemplate;
+    NSLog(@"[SevaroTwilioLog] Current self.incomingCallContactHandleTemplate: %@", templateToUse);
+
+    if (templateToUse == nil || templateToUse.length == 0) {
+        templateToUse = [[NSUserDefaults standardUserDefaults] stringForKey:@"IncomingCallContactHandleTemplate"];
+        NSLog(@"[SevaroTwilioLog] Loaded template from NSUserDefaults: %@", templateToUse);
+    }
+
+    if (templateToUse != nil && templateToUse.length > 0) {
+        handleName = [self getDisplayName:templateToUse customParameters:[callInvite customParameters]];
+        NSLog(@"[SevaroTwilioLog] Updated handleName from template: %@", handleName);
         handleName = @"Unknown Caller";
     }
     if (self.incomingCallContactHandleTemplate != NULL && [self.incomingCallContactHandleTemplate length] > 0) {
