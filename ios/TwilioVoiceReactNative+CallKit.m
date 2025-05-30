@@ -82,7 +82,12 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
 }
 
 - (void)reportNewIncomingCall:(TVOCallInvite *)callInvite {
-   NSString *templateToUse = self.incomingCallContactHandleTemplate;
+    NSString *handleName = callInvite.from;
+    if (handleName == nil) {
+        handleName = @"Unknown Caller";
+    }
+    
+    NSString *templateToUse = self.incomingCallContactHandleTemplate;
     NSLog(@"[SevaroTwilioLog] Current self.incomingCallContactHandleTemplate: %@", templateToUse);
 
     if (templateToUse == nil || templateToUse.length == 0) {
