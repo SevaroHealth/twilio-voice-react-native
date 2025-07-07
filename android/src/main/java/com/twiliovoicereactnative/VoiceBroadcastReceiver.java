@@ -122,9 +122,9 @@ public class VoiceBroadcastReceiver {
         }
     }
 
-    public static String getName(CallRecordDatabase.CallRecord callRecord) {
+    public static String getName(CallRecordDatabase.CallRecord callRecord, Context context) {
       if (callRecord.getDirection() == CallRecord.Direction.INCOMING) {
-        final String template = ConfigurationProperties.getIncomingCallContactHandleTemplate();
+        final String template = ConfigurationProperties.getIncomingCallContactHandleTemplate(context);
         if (template != null) {
           final String processedTemplate =
             templateDisplayName(template, callRecord.getCustomParameters());

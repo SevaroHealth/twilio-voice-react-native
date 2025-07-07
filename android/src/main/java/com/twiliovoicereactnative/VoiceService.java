@@ -212,7 +212,7 @@ public class VoiceService extends Service {
     
     if(isRegistered) {
       logger.debug("Connection service is registered, sending broadcast intent and handling natively");
-      String callerName = VoiceBroadcastReceiver.getName(callRecord);
+      String callerName = VoiceBroadcastReceiver.getName(callRecord, VoiceService.this);
       logger.debug("Caller Name: " + callerName);
       Bundle callData = new Bundle();
       callData.putString("callUUID", callRecord.getUuid().toString());

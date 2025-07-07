@@ -368,7 +368,7 @@ public class TwilioVoiceReactNativeModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void voice_setIncomingCallContactHandleTemplate(String template, Promise promise) {
-    ConfigurationProperties.setIncomingCallContactHandleTemplate(template);
+    ConfigurationProperties.setIncomingCallContactHandleTemplate(template, reactContext);
     promise.resolve(null);
   }
 
