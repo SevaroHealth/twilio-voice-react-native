@@ -139,9 +139,36 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
     CXEndCallAction *endCallAction = [[CXEndCallAction alloc] initWithCallUUID:uuid];
     CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
     
+    CXCallObserver *callObserver = [[CXCallObserver alloc] init];
+    NSArray<CXCall *> *currentCalls = callObserver.calls;
+
+    NSLog(@"[SevaroTwilioLog] Number of active calls in CallKit: %lu", (unsigned long)currentCalls.count);
+
+    for (CXCall *call in currentCalls) {
+        NSLog(@"[SevaroTwilioLog] Call UUID: %@, hasConnected: %d, hasEnded: %d, outgoing: %d",
+            call.UUID.UUIDString,
+            call.hasConnected,
+            call.hasEnded,
+            call.outgoing);
+    }
+
+    NSLog(@"[SevaroTwilioLog] End call action created with UUID: %@", uuid.UUIDString);
     [self.callKitCallController requestTransaction:transaction completion:^(NSError *error) {
         if (error) {
             NSLog(@"Failed to submit end-call transaction request: %@", error);
+            if (self.callMap[uuid.UUIDString]) {
+                NSLog(@"[SevaroTwilioLog] Found the call in twilio");
+                TVOCall *call = self.callMap[uuid.UUIDString];
+                NSLog(@"[SevaroTwilioLog] Disconnecting the twilio call call");
+                [call disconnect];
+                NSLog(@"[SevaroTwilioLog] Disconnected the twilio call call");
+            }
+            NSLog(@"[SevaroTwilioLog] Ending the call forcefully now");
+            [self.callKitProvider reportCallWithUUID:uuid
+                                         endedAtDate:[NSDate date]
+                                              reason:CXCallEndedReasonRemoteEnded];
+            NSLog(@"[SevaroTwilioLog] Call ended forcefully");
+
         } else {
             NSLog(@"End-call transaction successfully done");
         }
