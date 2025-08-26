@@ -12,6 +12,7 @@
 #import "TwilioVoicePushRegistry.h"
 #import "TwilioVoiceReactNative.h"
 #import "TwilioVoiceReactNativeConstants.h"
+#import "TwilioVoiceReactNative-Swift.h"
 
 NSString * const kTwilioVoicePushRegistryNotification = @"TwilioVoicePushRegistryNotification";
 NSString * const kTwilioVoicePushRegistryEventType = @"type";
@@ -42,6 +43,7 @@ NSString * const kTwilioVoicePushRegistryNotificationIncomingPushPayload = @"inc
 - (void)pushRegistry:(PKPushRegistry *)registry
 didUpdatePushCredentials:(PKPushCredentials *)credentials
              forType:(NSString *)type {
+    [[AppEventLogger shared] log:@"didUpdatePushCredentials" type:LogTypeInfo];
     if ([type isEqualToString:PKPushTypeVoIP]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kTwilioVoicePushRegistryNotification
                                                             object:nil
@@ -54,6 +56,7 @@ didUpdatePushCredentials:(PKPushCredentials *)credentials
 didReceiveIncomingPushWithPayload:(PKPushPayload *)payload
              forType:(PKPushType)type
 withCompletionHandler:(void (^)(void))completion {
+    [[AppEventLogger shared] log:@"didReceiveIncomingPushWithPayload" type:LogTypeInfo];
     if ([type isEqualToString:PKPushTypeVoIP]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kTwilioVoicePushRegistryNotification
                                                             object:nil
