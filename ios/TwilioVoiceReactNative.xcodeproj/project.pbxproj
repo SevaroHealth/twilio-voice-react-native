@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48BE5D9C2E5ECDC100E0D979 /* AppEventLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BE5D9B2E5ECDC100E0D979 /* AppEventLogger.swift */; };
 		8F19C42D2683AE0200F765F1 /* TwilioVoicePushRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F19C42C2683AE0200F765F1 /* TwilioVoicePushRegistry.m */; };
 		8FC9E80D2B74A4A100F5D778 /* TwilioVoiceReactNative+CallInvite.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC9E80C2B74A4A100F5D778 /* TwilioVoiceReactNative+CallInvite.m */; };
 		8FC9E80F2B74A57800F5D778 /* TwilioVoiceReactNative+CallMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC9E80E2B74A57800F5D778 /* TwilioVoiceReactNative+CallMessage.m */; };
@@ -26,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libTwilioVoiceReactNative.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTwilioVoiceReactNative.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		48BE5D9B2E5ECDC100E0D979 /* AppEventLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventLogger.swift; sourceTree = "<group>"; };
+		48BE5D9D2E5ECDC500E0D979 /* TwilioVoiceReactNative-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TwilioVoiceReactNative-Bridging-Header.h"; sourceTree = "<group>"; };
 		8F19C42B2683AE0200F765F1 /* TwilioVoicePushRegistry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwilioVoicePushRegistry.h; sourceTree = "<group>"; };
 		8F19C42C2683AE0200F765F1 /* TwilioVoicePushRegistry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwilioVoicePushRegistry.m; sourceTree = "<group>"; };
 		8F5ED22E268D428F00572F00 /* TwilioVoiceReactNative+CallKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "TwilioVoiceReactNative+CallKit.m"; sourceTree = "<group>"; };
@@ -86,6 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				8F9DA21A281A0EE900EBB341 /* TwilioVoiceStatsReport.h */,
+				48BE5D9B2E5ECDC100E0D979 /* AppEventLogger.swift */,
+				48BE5D9D2E5ECDC500E0D979 /* TwilioVoiceReactNative-Bridging-Header.h */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -121,6 +126,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1630;
 					};
 				};
 			};
@@ -149,6 +155,7 @@
 			files = (
 				8FC9E80F2B74A57800F5D778 /* TwilioVoiceReactNative+CallMessage.m in Sources */,
 				8FC9E80D2B74A4A100F5D778 /* TwilioVoiceReactNative+CallInvite.m in Sources */,
+				48BE5D9C2E5ECDC100E0D979 /* AppEventLogger.swift in Sources */,
 				8F19C42D2683AE0200F765F1 /* TwilioVoicePushRegistry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,6 +269,8 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -277,12 +286,17 @@
 				);
 				PRODUCT_NAME = TwilioVoiceReactNative;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Utilities/TwilioVoiceReactNative-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -298,6 +312,8 @@
 				);
 				PRODUCT_NAME = TwilioVoiceReactNative;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Utilities/TwilioVoiceReactNative-Bridging-Header.h";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
