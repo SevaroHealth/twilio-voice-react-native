@@ -9,6 +9,8 @@
 
 #import "TwilioVoiceReactNative.h"
 #import "TwilioVoiceReactNativeConstants.h"
+#import "twilio_voice_react_native-Swift.h"
+
 
 @interface TwilioVoiceReactNative (CallInvite) <TVONotificationDelegate>
 
@@ -17,6 +19,8 @@
 @implementation TwilioVoiceReactNative (CallInvite)
 
 - (void)callInviteReceived:(TVOCallInvite *)callInvite {
+    [[AppEventLogger shared] log:@"callInviteReceived" type:LogTypeInfo];
+
     self.callInviteMap[callInvite.uuid.UUIDString] = callInvite;
     
     [self reportNewIncomingCall:callInvite];
@@ -28,6 +32,8 @@
 }
 
 - (void)cancelledCallInviteReceived:(TVOCancelledCallInvite *)cancelledCallInvite error:(NSError *)error {
+    [[AppEventLogger shared] log:@"cancelledCallInviteReceived" type:LogTypeInfo];
+
     NSString *uuid;
     for (NSString *uuidKey in [self.callInviteMap allKeys]) {
         TVOCallInvite *callInvite = self.callInviteMap[uuidKey];

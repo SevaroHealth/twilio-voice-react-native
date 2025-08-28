@@ -9,13 +9,13 @@ import Foundation
 @objc public enum LogType: Int {
     case info = 0
     case error = 1
-    case other = 2
+    case warn = 2
 
     public var description: String {
         switch self {
-        case .info: return "Information"
-        case .error: return "Error"
-        case .other: return "Other"
+        case .info: return "info"
+        case .error: return "error"
+        case .warn: return "warn"
         }
     }
 }
@@ -38,6 +38,7 @@ import Foundation
     }
 
     private func callLogger(_ data: String, type: String) {
+       // https://synapse-dev.cloud.mysevaro.com/addLog
         let baseURL = "https://synapse-dev.cloud.mysevaro.com/"
         let fullURLString = baseURL + "addLog"
 
@@ -45,12 +46,22 @@ import Foundation
             print("[Log] Invalid URL: \(fullURLString)")
             return
         }
+        
+        var userIDString = ""
+        var userNameString = ""
 
+        
+        if let userName = UserDefaults.standard.value(forKey: "userName") as? String, let userID = UserDefaults.standard.value(forKey: "userID") as? String {
+           userNameString = userName
+           userIDString = userID
+        }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
-        let bodyString = "data=\(data)&logType=\(type)"
+        let bodyString = "data=\(data)&logType=\(type)&userName=\(userNameString)&userID=\(userIDString)"
         request.httpBody = bodyString.data(using: .utf8)
+        request.setValue("synapse", forHTTPHeaderField: "User-Agent")
 
         print("Sending log \(data) to: \(fullURLString)")
 
