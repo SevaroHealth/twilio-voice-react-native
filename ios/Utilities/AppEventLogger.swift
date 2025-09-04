@@ -38,7 +38,9 @@ import Foundation
     }
 
     private func callLogger(_ data: String, type: String) {
-       // https://synapse-dev.cloud.mysevaro.com/addLog
+     // for Dev/QA:- https://synapse-dev.cloud.mysevaro.com/addLog
+    // for Prod:- https://synapse.cloud.mysevaro.com/
+
         let baseURL = "https://synapse-dev.cloud.mysevaro.com/"
         let fullURLString = baseURL + "addLog"
 

@@ -301,10 +301,13 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
 }
 
 - (void)provider:(CXProvider *)provider didActivateAudioSession:(AVAudioSession *)audioSession {
+  [[AppEventLogger shared] log:@"didActivateAudioSession" type:LogTypeInfo];
     [TwilioVoiceReactNative twilioAudioDevice].enabled = YES;
 }
 
 - (void)provider:(CXProvider *)provider didDeactivateAudioSession:(AVAudioSession *)audioSession {
+  [[AppEventLogger shared] log:@"didDeactivateAudioSession" type:LogTypeInfo];
+
     [TwilioVoiceReactNative twilioAudioDevice].enabled = NO;
 }
 
@@ -544,6 +547,8 @@ previousWarnings:(NSSet<NSNumber *> *)previousWarnings {
 #pragma mark - Ringback
 
 - (void)playRingback {
+  [[AppEventLogger shared] log:@"playRingback" type:LogTypeInfo];
+
     NSString *ringtonePath = [[NSBundle mainBundle] pathForResource:@"ringtone" ofType:@"wav"];
     if ([ringtonePath length] <= 0) {
         NSLog(@"Can't find sound file");
@@ -564,6 +569,8 @@ previousWarnings:(NSSet<NSNumber *> *)previousWarnings {
 }
 
 - (void)stopRingback {
+  [[AppEventLogger shared] log:@"stopRingback" type:LogTypeInfo];
+
     if (!self.ringbackPlayer.isPlaying) {
         return;
     }
@@ -586,7 +593,7 @@ previousWarnings:(NSSet<NSNumber *> *)previousWarnings {
 #pragma mark - Warning event conversion
 
 - (NSString *)warningNameWithNumber:(NSNumber *)warning {
-    [[AppEventLogger shared] log:@"Warning number out of TVOCallQualityWarning range" type:LogTypeInfo];
+  [[AppEventLogger shared] log:@"warningNameWithNumber" type:LogTypeInfo];
 
     if ([warning intValue] < 0 || [warning intValue] > 4) {
         NSLog(@"Warning number out of TVOCallQualityWarning range");

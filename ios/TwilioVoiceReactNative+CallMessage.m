@@ -76,6 +76,7 @@
 #pragma mark - Utility
 
 - (NSDictionary *)callMessageInfo:(TVOCallMessage *)callMessage {
+  [[AppEventLogger shared] log:@"callMessageInfo" type:LogTypeInfo];
     NSDictionary *callMessageInfoObject = @{
         kTwilioVoiceReactNativeVoiceEventSid: callMessage.voiceEventSid,
         kTwilioVoiceReactNativeCallMessageContent: callMessage.content,

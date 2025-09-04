@@ -195,6 +195,7 @@ static TVODefaultAudioDevice *sTwilioAudioDevice;
 }
 
 - (NSDictionary *)availableAudioDevices {
+  [[AppEventLogger shared] log:@"availableAudioDevices" type:LogTypeInfo];
 
     // Pop all except the built-in earpiece and speaker
     for (NSString *key in [self.audioDevices allKeys]) {
@@ -275,6 +276,8 @@ static TVODefaultAudioDevice *sTwilioAudioDevice;
 }
 
 - (NSString *)audioPortTypeMapping:(NSString *)portType {
+  [[AppEventLogger shared] log:@"audioPortTypeMapping" type:LogTypeInfo];
+
     if ([portType isEqualToString:AVAudioSessionPortBuiltInReceiver]) {
         return kTwilioVoiceReactNativeAudioDeviceKeyEarpiece;
     } else if ([portType isEqualToString:AVAudioSessionPortBuiltInSpeaker]) {
@@ -403,6 +406,8 @@ static TVODefaultAudioDevice *sTwilioAudioDevice;
 }
 
 - (NSDictionary *)cancelledCallInviteInfo:(TVOCancelledCallInvite *)cancelledCallInvite {
+  [[AppEventLogger shared] log:@"cancelledCallInviteInfo" type:LogTypeInfo];
+
     NSMutableDictionary *cancelledCallInviteInfo = [@{
         kTwilioVoiceReactNativeCancelledCallInviteInfoCallSid: cancelledCallInvite.callSid,
         kTwilioVoiceReactNativeCancelledCallInviteInfoTo: cancelledCallInvite.to
