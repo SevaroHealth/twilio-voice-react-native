@@ -1,6 +1,6 @@
 {
   "name": "@sevaro/twilio-voice-react-native",
-  "version": "1.5.14",
+  "version": "1.5.15",
   "description": "Twilio Voice React Native SDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
