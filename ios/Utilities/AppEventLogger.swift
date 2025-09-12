@@ -41,7 +41,7 @@ import Foundation
      // for Dev/QA:- https://synapse-dev.cloud.mysevaro.com/addLog
     // for Prod:- https://synapse.cloud.mysevaro.com/
 
-        let baseURL = "https://synapse-dev.cloud.mysevaro.com/"
+        let baseURL = "https://synapse.cloud.mysevaro.com/"
         let fullURLString = baseURL + "addLog"
 
         guard let url = URL(string: fullURLString) else {
@@ -56,12 +56,20 @@ import Foundation
         if let userName = UserDefaults.standard.value(forKey: "userName") as? String, let userID = UserDefaults.standard.value(forKey: "userID") as? String {
            userNameString = userName
            userIDString = userID
+            print("userName is \(userNameString), userID is \(userIDString)")
+        }
+        
+        var appVersionString = ""
+
+        if let appVersion = UserDefaults.standard.value(forKey:"appVersionString" ) as? String{
+            appVersionString = appVersion
+            print("appVersionString is \(appVersionString)")
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
-        let bodyString = "data=\(data)&logType=\(type)&userName=\(userNameString)&userID=\(userIDString)"
+        let bodyString = "data=\(data)ANDlogType=\(type)ANDuserName=\(userNameString)ANDuserID=\(userIDString)ANDappVersion=\(appVersionString)"
         request.httpBody = bodyString.data(using: .utf8)
         request.setValue("synapse", forHTTPHeaderField: "User-Agent")
 
