@@ -31,7 +31,7 @@ static NSString * const kTwilioVoiceReactNativeVoiceErrorKeyMessage = @"message"
 static NSString * const kTwilioVoiceReactNativeVoiceEventRegistered = @"voiceEventRegistered";
 static NSString * const kTwilioVoiceReactNativeVoiceEventUnregistered = @"voiceEventUnregistered";
 
-// Device token lifecycle
+// Device token lifecycle (VoIP / PushKit on iOS)
 static NSString * const kTwilioVoiceReactNativeVoiceEventDeviceTokenUpdated = @"voiceEventDeviceTokenUpdated";
 static NSString * const kTwilioVoiceReactNativeVoiceEventDeviceTokenInvalidated = @"voiceEventDeviceTokenInvalidated";
 

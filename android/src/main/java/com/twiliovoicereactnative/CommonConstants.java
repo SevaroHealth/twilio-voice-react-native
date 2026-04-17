@@ -25,6 +25,10 @@ public class CommonConstants {
   public static final String VoiceEventRegistered = "voiceEventRegistered";
   public static final String VoiceEventUnregistered = "voiceEventUnregistered";
 
+  // Device token lifecycle (VoIP / PushKit on iOS)
+  public static final String VoiceEventDeviceTokenUpdated = "voiceEventDeviceTokenUpdated";
+  public static final String VoiceEventDeviceTokenInvalidated = "voiceEventDeviceTokenInvalidated";
+
   // Call Info
   public static final String CallInfoUuid = "uuid";
   public static final String CallInfoSid = "sid";
