@@ -246,10 +246,17 @@ NSString * const kDefaultCallKitConfigurationName = @"Twilio Voice React Native"
 - (void)performAnswerVoiceCallWithUUID:(NSUUID *)uuid
                             completion:(void(^)(BOOL success))completionHandler {
     [[AppEventLogger shared] log:@"performAnswerVoiceCallWithUUID." type:LogTypeInfo];
-
-    NSAssert(self.callInviteMap[uuid.UUIDString], @"No call invite");
     
     TVOCallInvite *callInvite = self.callInviteMap[uuid.UUIDString];
+
+    if (!callInvite) {
+        NSLog(@"[TwilioVoiceReactNative] No call invite found for UUID: %@, call was likely cancelled before answer", uuid.UUIDString);
+        [[AppEventLogger shared] log:[NSString stringWithFormat:@"No call invite for UUID %@, ending call gracefully", uuid.UUIDString] type:LogTypeInfo];
+        completionHandler(NO);
+        [self.callKitProvider reportCallWithUUID:uuid endedAtDate:[NSDate date] reason:CXCallEndedReasonFailed];
+        return;
+    }
+    
     TVOAcceptOptions *acceptOptions = [TVOAcceptOptions optionsWithCallInvite:callInvite block:^(TVOAcceptOptionsBuilder *builder) {
         builder.uuid = uuid;
         builder.callMessageDelegate = self;

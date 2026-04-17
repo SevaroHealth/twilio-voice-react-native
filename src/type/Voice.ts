@@ -11,6 +11,14 @@ export interface NativeUnregisteredEvent {
   type: Constants.VoiceEventUnregistered;
 }
 
+export interface NativeDeviceTokenUpdatedEvent {
+  type: Constants.VoiceEventDeviceTokenUpdated;
+}
+
+export interface NativeDeviceTokenInvalidatedEvent {
+  type: Constants.VoiceEventDeviceTokenInvalidated;
+}
+
 export interface NativeCallInviteIncomingEvent {
   [Constants.VoiceEventType]: Constants.VoiceEventTypeValueIncomingCallInvite;
   callInvite: NativeCallInviteInfo;
@@ -21,11 +29,15 @@ export type NativeVoiceEvent =
   | NativeCallInviteIncomingEvent
   | NativeErrorEvent
   | NativeRegisteredEvent
-  | NativeUnregisteredEvent;
+  | NativeUnregisteredEvent
+  | NativeDeviceTokenUpdatedEvent
+  | NativeDeviceTokenInvalidatedEvent;
 
 export type NativeVoiceEventType =
   | Constants.VoiceEventAudioDevicesUpdated
   | Constants.VoiceEventTypeValueIncomingCallInvite
   | Constants.VoiceEventError
   | Constants.VoiceEventRegistered
-  | Constants.VoiceEventUnregistered;
+  | Constants.VoiceEventUnregistered
+  | Constants.VoiceEventDeviceTokenUpdated
+  | Constants.VoiceEventDeviceTokenInvalidated;

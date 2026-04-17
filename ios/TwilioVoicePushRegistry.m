@@ -19,6 +19,7 @@
 NSString * const kTwilioVoicePushRegistryNotification = @"TwilioVoicePushRegistryNotification";
 NSString * const kTwilioVoicePushRegistryEventType = @"type";
 NSString * const kTwilioVoicePushRegistryNotificationDeviceTokenUpdated = @"deviceTokenUpdated";
+NSString * const kTwilioVoicePushRegistryNotificationDeviceTokenInvalidated = @"deviceTokenInvalidated";
 NSString * const kTwilioVoicePushRegistryNotificationDeviceToken = @"deviceToken";
 NSString * const kTwilioVoicePushRegistryNotificationIncomingPushReceived = @"incomingPushReceived";
 NSString * const kTwilioVoicePushRegistryNotificationIncomingPushPayload = @"incomingPushPayload";
@@ -75,7 +76,11 @@ withCompletionHandler:(void (^)(void))completion {
     [[AppEventLogger shared] log:[NSString stringWithFormat:@"didInvalidatePushTokenForType - %@", type]
                             type:LogTypeInfo];
 
-    // TODO: notify view-controller to emit event that the push-registry has been invalidated
+    if ([type isEqualToString:PKPushTypeVoIP]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kTwilioVoicePushRegistryNotification
+                                                            object:nil
+                                                          userInfo:@{kTwilioVoicePushRegistryEventType: kTwilioVoicePushRegistryNotificationDeviceTokenInvalidated}];
+    }
 }
 
 @end

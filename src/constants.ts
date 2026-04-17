@@ -22,6 +22,10 @@ export enum Constants {
   // Registration
   'VoiceEventRegistered' = 'voiceEventRegistered',
   'VoiceEventUnregistered' = 'voiceEventUnregistered',
+ 
+  // Device token lifecycle (VoIP / PushKit on iOS)
+  'VoiceEventDeviceTokenUpdated' = 'voiceEventDeviceTokenUpdated',
+  'VoiceEventDeviceTokenInvalidated' = 'voiceEventDeviceTokenInvalidated',
 
   // Call Info
   'CallInfoUuid' = 'uuid',

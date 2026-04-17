@@ -140,7 +140,16 @@ static TVODefaultAudioDevice *sTwilioAudioDevice;
     if ([type isEqualToString:kTwilioVoicePushRegistryNotificationDeviceTokenUpdated]) {
         self.deviceTokenData = eventBody[kTwilioVoicePushRegistryNotificationDeviceToken];
 
-        // Skip the event emitting since 1, the listener has not registered and 2, the app does not need to know about this
+        // Forward the token-updated event to JS so the app can re-register with Twilio using the fresh VoIP token.
+        [self sendEventWithName:kTwilioVoiceReactNativeScopeVoice
+                           body:@{kTwilioVoiceReactNativeVoiceEventType: kTwilioVoiceReactNativeVoiceEventDeviceTokenUpdated}];
+        return;
+    } else if ([type isEqualToString:kTwilioVoicePushRegistryNotificationDeviceTokenInvalidated]) {
+        self.deviceTokenData = nil;
+
+        // Forward the token-invalidated event to JS so the app can re-register after Apple invalidates the current VoIP token.
+        [self sendEventWithName:kTwilioVoiceReactNativeScopeVoice
+                           body:@{kTwilioVoiceReactNativeVoiceEventType: kTwilioVoiceReactNativeVoiceEventDeviceTokenInvalidated}];
         return;
     } else if ([type isEqualToString:kTwilioVoicePushRegistryNotificationIncomingPushReceived]) {
         NSDictionary *payload = eventBody[kTwilioVoicePushRegistryNotificationIncomingPushPayload];

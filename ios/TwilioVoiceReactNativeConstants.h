@@ -31,6 +31,10 @@ static NSString * const kTwilioVoiceReactNativeVoiceErrorKeyMessage = @"message"
 static NSString * const kTwilioVoiceReactNativeVoiceEventRegistered = @"voiceEventRegistered";
 static NSString * const kTwilioVoiceReactNativeVoiceEventUnregistered = @"voiceEventUnregistered";
 
+// Device token lifecycle
+static NSString * const kTwilioVoiceReactNativeVoiceEventDeviceTokenUpdated = @"voiceEventDeviceTokenUpdated";
+static NSString * const kTwilioVoiceReactNativeVoiceEventDeviceTokenInvalidated = @"voiceEventDeviceTokenInvalidated";
+
 // Call Info
 static NSString * const kTwilioVoiceReactNativeCallInfoUuid = @"uuid";
 static NSString * const kTwilioVoiceReactNativeCallInfoSid = @"sid";

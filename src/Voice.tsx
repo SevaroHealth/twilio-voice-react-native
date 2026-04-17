@@ -62,6 +62,13 @@ export declare interface Voice {
   emit(voiceEvent: Voice.Event.Unregistered): boolean;
 
   /** @internal */
+  emit(voiceEvent: Voice.Event.DeviceTokenUpdated): boolean;
+
+  /** @internal */
+  emit(voiceEvent: Voice.Event.DeviceTokenInvalidated): boolean;
+
+
+  /** @internal */
   emit(voiceEvent: Voice.Event, ...args: any[]): boolean;
 
   /**
@@ -194,6 +201,39 @@ export declare interface Voice {
   ): this;
 
   /**
+   * Device token updated event. Raised on iOS when PushKit issues or rotates
+   * the VoIP push token. The app should call {@link (Voice:class).register}
+   * with a fresh access token to keep Twilio's binding in sync, otherwise
+   * incoming calls may stop arriving after Apple rotates the token.
+   */
+  addListener(
+    deviceTokenUpdatedEvent: Voice.Event.DeviceTokenUpdated,
+    listener: Voice.Listener.DeviceTokenUpdated
+  ): this;
+  /** {@inheritDoc (Voice:interface).(addListener:6)} */
+  on(
+    deviceTokenUpdatedEvent: Voice.Event.DeviceTokenUpdated,
+    listener: Voice.Listener.DeviceTokenUpdated
+  ): this;
+
+  /**
+   * Device token invalidated event. Raised on iOS when PushKit reports
+   * `didInvalidatePushTokenForType:` for the VoIP push type. The app should
+   * re-run `voice.register(token)` once a new token becomes available so
+   * Twilio stops sending invites to a dead endpoint.
+   */
+  addListener(
+    deviceTokenInvalidatedEvent: Voice.Event.DeviceTokenInvalidated,
+    listener: Voice.Listener.DeviceTokenInvalidated
+  ): this;
+  /** {@inheritDoc (Voice:interface).(addListener:7)} */
+  on(
+    deviceTokenInvalidatedEvent: Voice.Event.DeviceTokenInvalidated,
+    listener: Voice.Listener.DeviceTokenInvalidated
+  ): this;
+
+
+  /**
    * Generic event listener typings.
    * @param voiceEvent - The raised event string.
    * @param listener - A listener function that will be invoked when the event
@@ -201,7 +241,7 @@ export declare interface Voice {
    * @returns - The call object.
    */
   addListener(voiceEvent: Voice.Event, listener: Voice.Listener.Generic): this;
-  /** {@inheritDoc (Voice:interface).(addListener:6)} */
+  /** {@inheritDoc (Voice:interface).(addListener:8)} */
   on(voiceEvent: Voice.Event, listener: Voice.Listener.Generic): this;
 }
 
@@ -270,6 +310,14 @@ export class Voice extends EventEmitter {
        */
       [Constants.VoiceEventRegistered]: this._handleRegistered,
       [Constants.VoiceEventUnregistered]: this._handleUnregistered,
+
+      /**
+       * Device token lifecycle (iOS VoIP)
+       */
+      [Constants.VoiceEventDeviceTokenUpdated]: this._handleDeviceTokenUpdated,
+      [Constants.VoiceEventDeviceTokenInvalidated]:
+        this._handleDeviceTokenInvalidated,
+
 
       /**
        * Audio Devices
@@ -420,6 +468,47 @@ export class Voice extends EventEmitter {
 
     this.emit(Voice.Event.Unregistered);
   };
+
+  /**
+   * Device token updated handler. Emits a
+   * {@link (Voice:namespace).Event.DeviceTokenUpdated} event whenever iOS
+   * PushKit delivers a new VoIP token so consumers can re-register with
+   * Twilio.
+   */
+  private _handleDeviceTokenUpdated = (
+    nativeVoiceEvent: NativeVoiceEvent
+  ) => {
+    if (nativeVoiceEvent.type !== Constants.VoiceEventDeviceTokenUpdated) {
+      throw new Error(
+        'Incorrect "voice#deviceTokenUpdated" handler called for type ' +
+          `"${nativeVoiceEvent.type}".`
+      );
+    }
+
+    this.emit(Voice.Event.DeviceTokenUpdated);
+  };
+
+  /**
+   * Device token invalidated handler. Emits a
+   * {@link (Voice:namespace).Event.DeviceTokenInvalidated} event whenever
+   * iOS PushKit reports the VoIP token as no longer valid so consumers can
+   * re-register once a fresh token is issued.
+   */
+  private _handleDeviceTokenInvalidated = (
+    nativeVoiceEvent: NativeVoiceEvent
+  ) => {
+    if (
+      nativeVoiceEvent.type !== Constants.VoiceEventDeviceTokenInvalidated
+    ) {
+      throw new Error(
+        'Incorrect "voice#deviceTokenInvalidated" handler called for type ' +
+          `"${nativeVoiceEvent.type}".`
+      );
+    }
+
+    this.emit(Voice.Event.DeviceTokenInvalidated);
+  };
+
 
   /**
    * Audio devices updated event handler. Generates a new list of
@@ -874,6 +963,23 @@ export namespace Voice {
      * | Voice.addListener(Unregistered)}.
      */
     'Unregistered' = 'unregistered',
+
+    /**
+     * Raised on iOS when PushKit issues or rotates the VoIP device token.
+     * Consumers should call {@link (Voice:class).register} with a fresh
+     * access token so Twilio's binding stays in sync. Android never emits
+     * this event.
+     */
+    'DeviceTokenUpdated' = 'deviceTokenUpdated',
+
+    /**
+     * Raised on iOS when PushKit reports
+     * `didInvalidatePushTokenForType:` for the VoIP push type. A new token
+     * will typically arrive later via
+     * {@link (Voice:namespace).Event.DeviceTokenUpdated}. Android never
+     * emits this event.
+     */
+    'DeviceTokenInvalidated' = 'deviceTokenInvalidated',
   }
 
   /**
@@ -942,12 +1048,24 @@ export namespace Voice {
     export type Unregistered = () => void;
 
     /**
+     * Device token updated event listener. Invoked when iOS PushKit issues
+     * or rotates the VoIP device token.
+     */
+    export type DeviceTokenUpdated = () => void;
+
+    /**
+     * Device token invalidated event listener. Invoked when iOS PushKit
+     * reports the current VoIP device token as no longer valid.
+     */
+    export type DeviceTokenInvalidated = () => void;
+
+    /**
      * Generic event listener. This should be the function signature of any
      * event listener bound to any voice event.
      *
      * @remarks
      *
-     * See {@link (Voice:interface).(addListener:6)}.
+     * See {@link (Voice:interface).(addListener:8)}.
      */
     export type Generic = (...args: any[]) => void;
   }
